@@ -1,10 +1,5 @@
-# hp_4.py
-#
-from datetime import datetime, timedelta
-from csv import DictReader, DictWriter
-from collections import defaultdict
-from typing import List, Tuple
-
+## reformat_dates()
+from datetime import datetime
 
 def reformat_dates(dates):
     new_dates = []
@@ -14,6 +9,9 @@ def reformat_dates(dates):
         new_dates.append(new_date_str)
     return new_dates
 
+
+## date_range()
+from datetime import datetime, timedelta
 
 def date_range(date_str, n):
     start = datetime.strptime(date_str, '%Y-%m-%d')
@@ -25,6 +23,9 @@ date_str, n = input_str.split(',')
 dates = date_range(date_str, int(n))
 print(dates)
 
+## add_date_range()
+from typing import List, Tuple
+from datetime import datetime, timedelta
 
 def date_range(start: str, n: int) -> List[datetime]:
     if not isinstance(start, str):
@@ -47,7 +48,7 @@ start_date = input("Enter the start date in yyyy-mm-dd format: ")
 result = add_date_range(values, start_date)
 print(result)
 
-
+## fees_report()
 import csv
 
 def fees_report(infile, outfile):
@@ -108,4 +109,3 @@ def fees_report(infile: str, outfile: str):
         for patron_id, fees in fees_by_patron.items():
             if fees > 0:
                 writer.writerow([patron_id, f'{fees:.2f}'])
-
