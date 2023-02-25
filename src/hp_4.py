@@ -39,8 +39,8 @@ def fees_report(infile, outfile):
         late_fees = {}
         for row in reader:
             patron_id = row['patron_id']
-            date_due = datetime.datetime.strptime(row['date_due'], '%d/%m/%Y')
-            date_returned = datetime.datetime.strptime(row['date_returned'], '%d/%m/%Y')
+            date_due = datetime.datetime.strptime(row['date_due'], '%m/%d/%Y')
+            date_returned = datetime.datetime.strptime(row['date_returned'], '%m/%d/%Y')
             if date_returned > date_due:
                 days_late = (date_returned - date_due).days
                 late_fee = days_late * 0.25
