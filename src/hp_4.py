@@ -22,6 +22,14 @@ def date_range(start, n):
         date_obj += datetime.timedelta(days=1)
     return dates
 
+def add_date_range(values: List[float], start_date: str) -> List[Tuple[datetime, float]]:
+    if not isinstance(values, list):
+        raise TypeError("values must be a list")
+    if not isinstance(start_date, str):
+        raise TypeError("start_date must be a string in yyyy-mm-dd format")
+    dates = date_range(start_date, len(values))
+    return list(zip(dates, values))
+
 import csv
 from collections import defaultdict
 from typing import Dict
