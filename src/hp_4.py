@@ -42,8 +42,8 @@ def fees_report(infile: str, outfile: str):
     fees_by_patron = defaultdict(float)
     for row in data:
         if row['date_returned']:
-            due_date = datetime.strptime(row['date_due'], '%m/%d/%y')
-            return_date = datetime.strptime(row['date_returned'], '%m/%d/%y')
+            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%y')
+            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%y')
             if return_date > due_date:
                 days_late = (return_date - due_date).days
                 fee = 0.25 * days_late
