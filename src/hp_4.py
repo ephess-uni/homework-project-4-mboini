@@ -22,12 +22,6 @@ def date_range(start, n):
         date_obj += datetime.timedelta(days=1)
     return dates
 
-import datetime
-
-def add_date_range(values, start_date):
-    dates = date_range(start_date, len(values))
-    return list(zip(dates, values))
-
 import csv
 from collections import defaultdict
 from typing import Dict
@@ -42,8 +36,8 @@ def fees_report(infile: str, outfile: str):
     fees_by_patron = defaultdict(float)
     for row in data:
         if row['date_returned']:
-            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%y')
-            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%y')
+            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%Y')
+            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%Y')
             if return_date > due_date:
                 days_late = (return_date - due_date).days
                 fee = 0.25 * days_late
@@ -56,5 +50,3 @@ def fees_report(infile: str, outfile: str):
         for patron_id, fees in fees_by_patron.items():
             if fees > 0:
                 writer.writerow([patron_id, f'{fees:.2f}'])
-
-
