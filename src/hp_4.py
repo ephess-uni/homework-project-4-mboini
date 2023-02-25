@@ -28,7 +28,7 @@ def fees_report(infile, outfile):
             data.append({'patron_id': row['patron_id'], 'late_fees': late_fees})
         grouped_data = {}
         for item in data:
-            grouped_data[item['patron_id']] = grouped_data.get(item['patron_id], 0) + item['late_fees']
+            grouped_data[item['patron_id']] = grouped_data.get(item['patron_id'], 0) + item['late_fees']
         output_data = [{'patron_id': k, 'late_fees': round(v, 2)} for k, v in grouped_data.items()]
     with open(outfile, 'w', newline='') as f:
         writer = DictWriter(f, fieldnames=['patron_id', 'late_fees'])
