@@ -50,3 +50,4 @@ def fees_report(infile, outfile):
                     late_fees[patron_id] = late_fee
         for patron_id, late_fee in late_fees.items():
             writer.writerow([patron_id, late_fee])
+
