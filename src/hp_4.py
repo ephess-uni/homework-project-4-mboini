@@ -22,11 +22,9 @@ def date_range(start, n):
         date_obj += datetime.timedelta(days=1)
     return dates
 
-def add_date_range(values: List[float], start_date: str) -> List[Tuple[datetime, float]]:
-    if not isinstance(values, list):
-        raise TypeError("values must be a list")
-    if not isinstance(start_date, str):
-        raise TypeError("start_date must be a string in yyyy-mm-dd format")
+import datetime
+
+def add_date_range(values, start_date):
     dates = date_range(start_date, len(values))
     return list(zip(dates, values))
 
@@ -44,8 +42,8 @@ def fees_report(infile: str, outfile: str):
     fees_by_patron = defaultdict(float)
     for row in data:
         if row['date_returned']:
-            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%Y')
-            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%Y')
+            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%y')
+            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%y')
             if return_date > due_date:
                 days_late = (return_date - due_date).days
                 fee = 0.25 * days_late
@@ -58,3 +56,5 @@ def fees_report(infile: str, outfile: str):
         for patron_id, fees in fees_by_patron.items():
             if fees > 0:
                 writer.writerow([patron_id, f'{fees:.2f}'])
+
+
