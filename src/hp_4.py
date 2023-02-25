@@ -1,58 +1,47 @@
-import datetime
+from datetime import datetime, timedelta
+from csv import DictReader, DictWriter
 
-def reformat_dates(dates):
-    new_dates = []
-    for date in dates:
-        datetime_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
-        new_date = datetime_obj.strftime('%d %b %Y')
-        new_dates.append(new_date)
+def reformat_dates(old_dates):
+    new_dates = [datetime.strptime(d, "%Y-%m-%d").strftime("%d %b %Y") for d in old_dates]
     return new_dates
 
-import datetime
-
 def date_range(start, n):
-    if not isinstance(start, str):
-        raise TypeError("start must be a string")
-    if not isinstance(n, int):
-        raise TypeError("n must be an integer")
-    dates = []
-    date_obj = datetime.datetime.strptime(start, '%Y-%m-%d')
-    for i in range(n):
-        dates.append(date_obj)
-        date_obj += datetime.timedelta(days=1)
+    dates = [datetime.strptime(start, "%Y-%m-%d") + timedelta(days=i) for i in range(n)]
     return dates
 
-import datetime
-
 def add_date_range(values, start_date):
-    dates = date_range(start_date, len(values))
-    return list(zip(dates, values))
+    result = [(datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=i), v) for i, v in enumerate(values)]
+    return result
 
-import csv
-from collections import defaultdict
-from typing import Dict
-
-def fees_report(infile: str, outfile: str):
-    # Read in the input data
-    with open(infile, 'r', newline='') as f:
-        reader = csv.DictReader(f)
-        data = [row for row in reader]
-
-    # Calculate late fees on a patron_id basis
-    fees_by_patron = defaultdict(float)
-    for row in data:
-        if row['date_returned']:
-            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%y')
-            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%y')
-            if return_date > due_date:
-                days_late = (return_date - due_date).days
-                fee = 0.25 * days_late
-                fees_by_patron[row['patron_id']] += fee
-
-    # Write out a summary report for all patrons
+def fees_report(infile, outfile):
+    with open(infile) as f:
+        rows = list(DictReader(f))
+        data = []
+        for row in rows:
+            due_date = datetime.strptime(row['date_due'], "%m/%d/%Y")
+            return_date = datetime.strptime(row['date_returned'], "%m/%d/%Y")
+            days_late = (return_date - due_date).days
+            if days_late > 0:
+                late_fees = round(days_late * 0.25, 2)
+            else:
+                late_fees = 0.0
+            data.append({'patron_id': row['patron_id'], 'late_fees': late_fees})
+        grouped_data = {}
+        for item in data:
+            grouped_data[item['patron_id']] = grouped_data.get(item['patron_id], 0) + item['late_fees']
+        output_data = [{'patron_id': k, 'late_fees': round(v, 2)} for k, v in grouped_data.items()]
     with open(outfile, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['patron_id', 'late_fees'])
-        for patron_id in sorted(set(row['patron_id'] for row in data)):
-            fees = fees_by_patron[patron_id]
-            writer.writerow([patron_id, f'${fees:.2f}' if fees > 0 else '$0.00'])
+        writer = DictWriter(f, fieldnames=['patron_id', 'late_fees'])
+        writer.writeheader()
+        writer.writerows(output_data)
+
+if __name__ == '__main__':
+    try:
+        from src.util import get_data_file_path
+    except ImportError:
+        from util import get_data_file_path
+    book_returns_path = get_data_file_path('book_returns_short.csv')
+    outfile = 'book_fees.csv'
+    fees_report(book_returns_path, outfile)
+    with open(outfile) as f:
+        print(f.read())
