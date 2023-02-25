@@ -29,25 +29,30 @@ def add_date_range(values, start_date):
     return list(zip(dates, values))
 
 import csv
-import datetime
+from collections import defaultdict
+from typing import Dict
 
-def fees_report(infile, outfile):
-    with open(infile, 'r') as fin, open(outfile, 'w', newline='') as fout:
-        reader = csv.DictReader(fin)
-        writer = csv.writer(fout)
+def fees_report(infile: str, outfile: str):
+    # Read in the input data
+    with open(infile, 'r', newline='') as f:
+        reader = csv.DictReader(f)
+        data = [row for row in reader]
+
+    # Calculate late fees on a patron_id basis
+    fees_by_patron = defaultdict(float)
+    for row in data:
+        if row['date_returned']:
+            due_date = datetime.datetime.strptime(row['date_due'], '%m/%d/%y')
+            return_date = datetime.datetime.strptime(row['date_returned'], '%m/%d/%y')
+            if return_date > due_date:
+                days_late = (return_date - due_date).days
+                fee = 0.25 * days_late
+                fees_by_patron[row['patron_id']] += fee
+
+    # Write out a summary report for all patrons
+    with open(outfile, 'w', newline='') as f:
+        writer = csv.writer(f)
         writer.writerow(['patron_id', 'late_fees'])
-        late_fees = {}
-        for row in reader:
-            patron_id = row['patron_id']
-            date_due = datetime.datetime.strptime(row['date_due'], '%m/%d/%Y')
-            date_returned = datetime.datetime.strptime(row['date_returned'], '%m/%d/%Y')
-            if date_returned > date_due:
-                days_late = (date_returned - date_due).days
-                late_fee = days_late * 0.25
-                if patron_id in late_fees:
-                    late_fees[patron_id] += late_fee
-                else:
-                    late_fees[patron_id] = late_fee
-        for patron_id, late_fee in late_fees.items():
-            writer.writerow([patron_id, late_fee])
-
+        for patron_id in sorted(set(row['patron_id'] for row in data)):
+            fees = fees_by_patron[patron_id]
+            writer.writerow([patron_id, f'${fees:.2f}' if fees > 0 else '$0.00'])
