@@ -3,7 +3,7 @@ import datetime
 def reformat_dates(dates):
     new_dates = []
     for date in dates:
-        datetime_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
+        datetime_obj = datetime.datetime.strptime(date, '%m/%d/%Y')
         new_date = datetime_obj.strftime('%d %b %Y')
         new_dates.append(new_date)
     return new_dates
@@ -16,7 +16,7 @@ def date_range(start, n):
     if not isinstance(n, int):
         raise TypeError("n must be an integer")
     dates = []
-    date_obj = datetime.datetime.strptime(start, '%Y-%m-%d')
+    date_obj = datetime.datetime.strptime(start, '%m/%d/%Y')
     for i in range(n):
         dates.append(date_obj)
         date_obj += datetime.timedelta(days=1)
@@ -39,8 +39,8 @@ def fees_report(infile, outfile):
         late_fees = {}
         for row in reader:
             patron_id = row['patron_id']
-            date_due = datetime.datetime.strptime(row['date_due'], '%Y-%m-%d')
-            date_returned = datetime.datetime.strptime(row['date_returned'], '%Y-%m-%d')
+            date_due = datetime.datetime.strptime(row['date_due'], '%m/%d/%Y')
+            date_returned = datetime.datetime.strptime(row['date_returned'], '%m/%d/%Y')
             if date_returned > date_due:
                 days_late = (date_returned - date_due).days
                 late_fee = days_late * 0.25
