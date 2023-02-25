@@ -50,3 +50,41 @@ def fees_report(infile, outfile):
                     late_fees[patron_id] = late_fee
         for patron_id, late_fee in late_fees.items():
             writer.writerow([patron_id, late_fee])
+
+import datetime
+import csv
+import pytest
+
+@pytest.fixture
+def book_returns_short():
+    data = [
+        {'patron_id': '001', 'date_due': '2022-01-01', 'date_returned': '2022-01-05'},
+        {'patron_id': '002', 'date_due': '2022-01-02', 'date_returned': '2022-01-06'},
+        {'patron_id': '003', 'date_due': '2022-01-03', 'date_returned': '2022-01-05'},
+        {'patron_id': '004', 'date_due': '2022-01-04', 'date_returned': '2022-01-05'},
+        {'patron_id': '005', 'date_due': '2022-01-05', 'date_returned': '2022-01-05'},
+    ]
+    with open('book_returns_short.csv', 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=['patron_id', 'date_due', 'date_returned'])
+        writer.writeheader()
+        writer.writerows(data)
+    yield 'book_returns_short.csv'
+    os.remove('book_returns_short.csv')
+
+@pytest.fixture
+def book_returns():
+    data = [
+        {'patron_id': '001', 'date_due': '2022-01-01', 'date_returned': '2022-01-05'},
+        {'patron_id': '002', 'date_due': '2022-01-02', 'date_returned': '2022-01-06'},
+        {'patron_id': '003', 'date_due': '2022-01-03', 'date_returned': '2022-01-05'},
+        {'patron_id': '004', 'date_due': '2022-01-04', 'date_returned': '2022-01-05'},
+        {'patron_id': '005', 'date_due': '2022-01-05', 'date_returned': '2022-01-05'},
+        {'patron_id': '006', 'date_due': '2022-01-06', 'date_returned': '2022-01-07'},
+        {'patron_id': '007', 'date_due': '2022-01-07', 'date_returned': '2022-01-08'},
+        {'patron_id': '008', 'date_due': '2022-01-08', 'date_returned': '2022-01-09'},
+        {'patron_id': '009', 'date_due': '2022-01-09', 'date_returned': '2022-01-10'},
+        {'patron_id': '010', 'date_due': '2022-01-10', 'date_returned': '2022-01-11'},
+    ]
+    with open('book_returns.csv', 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=['patron_id', 'date_due',
+
