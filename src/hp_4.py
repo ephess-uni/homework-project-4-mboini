@@ -1,3 +1,4 @@
+import csv
 import datetime
 
 def reformat_dates(dates):
@@ -8,8 +9,6 @@ def reformat_dates(dates):
         new_dates.append(new_date)
     return new_dates
 
-import datetime
-
 def date_range(start, n):
     if not isinstance(start, str):
         raise TypeError("start must be a string")
@@ -18,18 +17,13 @@ def date_range(start, n):
     dates = []
     date_obj = datetime.datetime.strptime(start, '%Y-%m-%d')
     for i in range(n):
-        dates.append(date_obj)
+        dates.append(date_obj.strftime('%Y-%m-%d'))
         date_obj += datetime.timedelta(days=1)
     return dates
-
-import datetime
 
 def add_date_range(values, start_date):
     dates = date_range(start_date, len(values))
     return list(zip(dates, values))
-
-import csv
-import datetime
 
 def fees_report(infile, outfile):
     with open(infile, 'r') as fin, open(outfile, 'w', newline='') as fout:
@@ -49,4 +43,4 @@ def fees_report(infile, outfile):
                 else:
                     late_fees[patron_id] = late_fee
         for patron_id, late_fee in late_fees.items():
-            writer.writerow([patron_id, late_fee])
+            writer.writerow([patron_id, round(late_fee, 2)])
